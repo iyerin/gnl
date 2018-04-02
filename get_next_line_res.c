@@ -15,7 +15,6 @@
 int	get_next_line(const int fd, char **line)
 {
 	static char	*buf;
-	char		*buf2;
 	char		*tmp;
 	size_t		i;
 	int			count;
@@ -26,30 +25,26 @@ int	get_next_line(const int fd, char **line)
 		return (-1);
 	if (!buf)
 	{
-		if (read(fd, buf = ft_strnew(BUFF_SIZE), BUFF_SIZE) < 0)
-		{
-			free(buf);
-			return (-1);
-		}
-		buf2 = buf;
-//// переделывать буфер.....
-	}
-	printf("buf2_0 = %s\n", buf2);
-	*line = ft_strnew(0);
-	printf("buf = %s\n", buf);
-	while (!ft_strchr(buf, 10))
-	{
-		tmp = *line;
-		*line = ft_strjoin(*line, buf);
-		free(tmp);
 		buf = ft_strnew(BUFF_SIZE);
-		printf("buf2 = %s\n", buf2);
-		free(buf2);
-		if (read(fd, buf, BUFF_SIZE) <= 0)
+		if (read(fd, buf, BUFF_SIZE) < 0)
+			return (-1);
+	}
+	*line = ft_strnew(0);
+	if (!ft_strchr(buf, 10))
+	{
+		//ft_strclr(*line);	
+		while (!ft_strchr(buf, 10))
 		{
-			if (*line[0])
-				return (1);
-			return (0);
+			tmp = *line;
+			*line = ft_strjoin(*line, buf);
+			free(tmp);
+			buf = ft_strnew(BUFF_SIZE);
+			if (read(fd, buf, BUFF_SIZE) <= 0)
+			{
+				if (*line[0])
+					return (1);
+				return (0);
+			}
 		}
 	}
 	while (*buf)
@@ -60,8 +55,6 @@ int	get_next_line(const int fd, char **line)
 			*line = ft_strjoin(*line, ft_strsub(buf - i, 0, i));
 			free(tmp);
 			buf++;
-			printf("buf_2 = %s\n", buf);
-			printf("buf2_2 = %s\n", buf2);
 			return (1);
 		}
 		i++;
@@ -87,8 +80,8 @@ int	main(void)
 	}
 	close(fd);
 	while(1)
-	{
-		;
-	}
+	// {
+	// 	;
+	// }
 	return (0);
 }
