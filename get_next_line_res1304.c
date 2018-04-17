@@ -14,31 +14,39 @@
 
 int	get_next_line(const int fd, char **line)
 {
-	static char	buf[BUFF_SIZE + 1];
-	char		buf2[BUFF_SIZE + 1];
+	static char	*buf;
+	char		*buf2;
 	char		*tmp;
 	size_t		i;
 	int			count;
-	int			j;
 
 	count = 0;
 	i = 0;
-	j = 0;
-
 	if (fd < 0)
 		return (-1);
-
-	buf[BUFF_SIZE] = 0;
-	if (!buf[0])
-		if (read(fd, buf, BUFF_SIZE) < 0)
+	if (!buf)
+	{
+		if (read(fd, buf = ft_strnew(BUFF_SIZE), BUFF_SIZE) < 0)
+		{
+			free(buf);
 			return (-1);
-	printf("buf = %s\n", buf);
+		}
+		//buf2 = buf;
+//// переделывать буфер.....
+	}
+	//buf2 = buf;
+	printf("buf2_0 = %s\n", buf2);
 	*line = ft_strnew(0);
+	printf("buf = %s\n", buf);
 	while (!ft_strchr(buf, 10))
 	{
 		tmp = *line;
 		*line = ft_strjoin(*line, buf);
 		free(tmp);
+		buf2 = buf;
+		buf = ft_strnew(BUFF_SIZE);
+		printf("buf2 = %s\n", buf2);
+		//free(buf2);
 		if (read(fd, buf, BUFF_SIZE) <= 0)
 		{
 			if (*line[0])
@@ -46,20 +54,21 @@ int	get_next_line(const int fd, char **line)
 			return (0);
 		}
 	}
-	while (buf[j])
+	while (*buf)
 	{
-		if (buf[j] == '\n')
+		if (*buf == '\n')
 		{
 			tmp = *line;
-			*line = ft_strjoin(*line, ft_strsub(buf, 0, i));
+			*line = ft_strjoin(*line, ft_strsub(buf - i, 0, i));
 			free(tmp);
-			j++;
-			buf = ft_memmove(buf, buf+j, BUFF_SIZE - j);
-
+			buf++;
+			printf("buf_2 = %s\n", buf);
+			printf("buf2_2 = %s\n", buf2);
 			return (1);
 		}
 		i++;
-		j++;
+		buf++;
+		
 	}
 	if (*line != NULL)
 		free(*line);
@@ -79,9 +88,9 @@ int	main(void)
 		ft_strdel(&line);
 	}
 	close(fd);
-	// while(1)
-	// {
-	// 	;
-	// }
+	while(1)
+	{
+		;
+	}
 	return (0);
 }
